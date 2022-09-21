@@ -1,0 +1,147 @@
+echo           screen
+dimension      3
+boundary       p p p
+units          lj
+atom_style    molecular
+angle_style   cosine/delta
+bond_style     harmonic
+
+region 1 block 0 210 0 150 0 40 units box
+region 2 block 20 56 55 90 0 40 units box
+region 3 block 88 124 55 90 0 40 units box
+region 4 block 155 191 55 90 0 40 units box
+region 5 union 3 2 3 4
+
+read_data      data.bd
+
+bond_coeff     1  100  0.5
+bond_coeff     2  100  0.5
+angle_coeff    1  0  180  
+
+pair_style     lj/cut 1.5
+pair_modify shift yes
+pair_coeff    1*3  1*3  5.0  1.0 1.1224 
+pair_coeff    4*10  4*10  5.0  0.5 0.5612
+pair_coeff    1*3  4*10  5.0  0.75 0.8418
+pair_coeff    6 7  10.0  0.5 1.0    # 3.0-18.0      
+pair_coeff    8 9  10.0  0.5 1.0    # 3.0-18.0
+
+special_bonds lj/coul 0 1 1    
+
+group         plane  type 1 2 
+group         tpa type 2 
+group         np type 3 4 5
+group         np1 type 3
+group         np2 type 4 5
+group         n1 molecule 2
+group         n2 molecule 3
+group         n3 molecule 4
+group         n4 molecule 5
+group         n5 molecule 6
+group         n6 molecule 7
+group         li type 6 7 8 9 10
+group         li1 type 6
+group         li2 type 7  
+group         li3 type 8
+group         li4 type 9  
+group         sys type 3 4 5 6 7 8 9 10
+group         t1 id 115051 115052
+group         t2 id 115057 115058
+group         t3 id 115063 115064
+group         t4 id 115069 115070
+group         t5 id 115075 115076
+group         t6 id 115081 115082
+group         s1 id 115054 115055
+group         s2 id 115060 115061
+group         s3 id 115066 115067
+group         s4 id 115072 115073
+group         s5 id 115078 115079
+group         s6 id 115084 115085
+
+
+#velocity       sys create 1.0 1467567 dist gaussian
+
+neighbor       2.0 bin
+neigh_modify   every 1 delay 0 exclude molecule/intra plane
+
+
+timestep       0.002
+compute        e1 li1 group/group li2
+compute        e2 li3 group/group li4
+#compute        e31 li1 group/group tpa
+#compute        e32 li2 group/group tpa
+#compute        e33 li3 group/group tpa
+#compute        e34 li4 group/group tpa
+compute        c1 np1 com
+compute        c2 np2 com
+compute        m1 t1 com
+compute        m2 t2 com
+compute        m3 t3 com
+compute        m4 t4 com
+compute        m5 t5 com
+compute        m6 t6 com
+compute        n1 s1 com
+compute        n2 s2 com
+compute        n3 s3 com
+compute        n4 s4 com
+compute        n5 s5 com
+compute        n6 s6 com
+
+variable  d1 equal sqrt((c_m1[1]-c_n1[1])*(c_m1[1]-c_n1[1])+(c_m1[2]-c_n1[2])*(c_m1[2]-c_n1[2])+(c_m1[3]-c_n1[3])*(c_m1[3]-c_n1[3]))
+variable  d2 equal sqrt((c_m2[1]-c_n2[1])*(c_m2[1]-c_n2[1])+(c_m2[2]-c_n2[2])*(c_m2[2]-c_n2[2])+(c_m2[3]-c_n2[3])*(c_m2[3]-c_n2[3]))
+variable  d3 equal sqrt((c_m3[1]-c_n3[1])*(c_m3[1]-c_n3[1])+(c_m3[2]-c_n3[2])*(c_m3[2]-c_n3[2])+(c_m3[3]-c_n3[3])*(c_m3[3]-c_n3[3]))
+variable  d4 equal sqrt((c_m4[1]-c_n4[1])*(c_m4[1]-c_n4[1])+(c_m4[2]-c_n4[2])*(c_m4[2]-c_n4[2])+(c_m4[3]-c_n4[3])*(c_m4[3]-c_n4[3]))
+variable  d5 equal sqrt((c_m5[1]-c_n5[1])*(c_m5[1]-c_n5[1])+(c_m5[2]-c_n5[2])*(c_m5[2]-c_n5[2])+(c_m5[3]-c_n5[3])*(c_m5[3]-c_n5[3]))
+variable  d6 equal sqrt((c_m6[1]-c_n6[1])*(c_m6[1]-c_n6[1])+(c_m6[2]-c_n6[2])*(c_m6[2]-c_n6[2])+(c_m6[3]-c_n6[3])*(c_m6[3]-c_n6[3]))
+
+#variable v11 equal (vx[115050]+vx[115051]+vx[115051])/3 
+#variable v12 equal (vx[115053]+vx[115054]+vx[115055])/3
+#variable v21 equal (vx[115056]+vx[115057]+vx[115058])/3 
+#variable v22 equal (vx[115059]+vx[115060]+vx[115061])/3
+#variable v31 equal (vx[115062]+vx[115063]+vx[115064])/3 
+#variable v32 equal (vx[115065]+vx[115066]+vx[115067])/3
+#variable v41 equal (vx[115068]+vx[115069]+vx[115070])/3 
+#variable v42 equal (vx[115071]+vx[115072]+vx[115073])/3
+#variable v51 equal (vx[115074]+vx[115075]+vx[115076])/3 
+#variable v52 equal (vx[115077]+vx[115078]+vx[115079])/3
+#variable v61 equal (vx[115080]+vx[115081]+vx[115082])/3 
+#variable v62 equal (vx[115083]+vx[115084]+vx[115085])/3
+
+#variable v1 equal vcm(np1,x)
+#variable v2 equal vcm(np2,x)
+#variable v3 equal vcm(n1,x)
+#variable v4 equal vcm(n2,x)
+#variable v5 equal vcm(n3,x)
+#variable v6 equal vcm(n4,x)
+#variable v7 equal vcm(n5,x)
+#variable v8 equal vcm(n6,x)
+variable n1 equal xcm(np1,x)
+variable n2 equal xcm(np2,x)
+variable m1 equal xcm(n1,x)
+variable m2 equal xcm(n2,x)
+variable m3 equal xcm(n3,x)
+variable m4 equal xcm(n4,x)
+variable m5 equal xcm(n5,x)
+variable m6 equal xcm(n6,x)
+
+
+#thermo_style   custom step temp ebond eangle etotal c_e1 c_e2 v_m1 v_m2 v_d1 v_d2 v_d3 v_d4 v_d5 v_d6 v_v1 v_v2 v_v3 v_v4 v_v5 v_v6 v_v7 v_v8
+thermo_style   custom step temp ebond eangle etotal c_e1 c_e2 v_n1 v_n2 v_m1 v_m2 v_m3 v_m4 v_m5 v_m6  v_d1 v_d2 v_d3 v_d4 v_d5 v_d6
+thermo         100
+
+
+restart        10000000 data
+fix            1 li nve
+fix            2 np nve/noforce
+fix            3 plane nve/noforce
+fix            4 all langevin 1.0 1.0 0.2 6098778
+dump           1  sys  custom   2000 sys.lammpstrj id type x y z
+dump           2  plane  custom  10000000 plane.lammpstrj id type x y z
+run            100000
+
+timestep       0.01
+unfix          2
+fix            2 np  rigid/nve molecule
+fix            5 sys addforce 0.1 0 0 region 1
+fix            6 sys addforce 0 -0.03 0 region 5
+run            9900000
